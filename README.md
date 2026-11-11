@@ -147,6 +147,33 @@ cd src-tauri && cargo test   # 141 tests: SOCD modes, click grid, failsafes, mac
 npx tsc --noEmit             # frontend types
 ```
 
+### macOS
+
+`src-tauri/tauri.conf.json` sets the macOS bundle: a `.app` and a `.dmg`,
+hardened runtime, the entitlements in `src-tauri/entitlements.plist`, and ad-hoc
+signing because `signingIdentity` is null. Build a universal app:
+
+```bash
+rustup target add aarch64-apple-darwin x86_64-apple-darwin
+npm run build:mac
+```
+
+The output lands in `src-tauri/target/universal-apple-darwin/release/bundle/`.
+`.github/workflows/macos.yml` runs the same build on a macOS runner when you
+dispatch it by hand.
+
+The Rust engines are still Windows-only. `hook.rs` installs a `WH_KEYBOARD_LL`
+hook, `input.rs` calls `SendInput`, `autostart.rs` writes `HKCU`, and the
+screenshots go through GDI. None of it is behind `cfg`, so the macOS build does
+not compile until the platform layer is ported.
+
+`rust-toolchain.toml` pins `stable` instead of the MSVC host so macOS can build.
+On Windows, set the host back once per machine:
+
+```bash
+rustup override set stable-x86_64-pc-windows-msvc
+```
+
 ## Updates
 
 Crossup checks `https://github.com/emrisca/crossup/releases/latest/download/latest.json`

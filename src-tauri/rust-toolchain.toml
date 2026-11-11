@@ -1,4 +1,5 @@
-# The default host toolchain on this machine is `windows-gnu`, whose linker is
-# missing the MinGW `dlltool.exe`. Tauri on Windows wants MSVC.
+# Pin the channel, not the host. macOS and CI resolve their own host
+# toolchain. A Windows machine needs the MSVC host:
+#   rustup override set stable-x86_64-pc-windows-msvc
 [toolchain]
-channel = "stable-x86_64-pc-windows-msvc"
+channel = "stable"
